@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Phaser Test</title>
+  <style>
+    body { background: #111; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    #game { border: 2px solid cyan; }
+  </style>
+</head>
+<body>
+  <div id="game"></div>
+  <script type="module">
+    import Phaser from "phaser";
+
+    class TestScene extends Phaser.Scene {
+      constructor() { super({ key: "TestScene" }); }
+
+      create() {
+        // Draw a grid
+        const g = this.add.graphics();
+        g.lineStyle(1, 0x333366, 0.5);
+        for (let x = 0; x <= 240; x += 24) g.lineBetween(x, 0, x, 480);
+        for (let y = 0; y <= 480; y += 24) g.lineBetween(0, y, 240, y);
+
+        // Draw some colored blocks
+        const colors = [0x00fff5, 0xffff00, 0x9b59b6, 0x39ff14, 0xff0040, 0x4444ff, 0xff6600];
+        colors.forEach((color, i) => {
+          g.fillStyle(color, 1);
+          g.fillRect(i * 24 + 2, 200 + 2, 20, 20);
+        });
+
+        // Moving block
+        this.block = this.add.graphics();
+        this.blockY = 0;
+        this.blockColor = 0x00fff5;
+      }
+
+      update() {
+        this.block.clear();
+        this.block.fillStyle(this.blockColor, 1);
+        this.block.fillRect(120 + 2, this.blockY + 2, 20, 20);
+        this.blockY += 1;
+        if (this.blockY > 460) this.blockY = 0;
+      }
+    }
+
+    new Phaser.Game({
+      type: Phaser.AUTO,
+      width: 240,
+      height: 480,
+      parent: "game",
+      backgroundColor: "#0a0a0a",
+      scene: [TestScene],
+      scale: {
+        mode: Phaser.Scale.NONE,
+        autoCenter: Phaser.Scale.NO_CENTER,
+      },
+    });
+  </script>
+</body>
+</html>

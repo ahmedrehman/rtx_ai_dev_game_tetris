@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Alpine + Tailwind Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+
+</head>
+<body class="bg-retro-black h-screen flex items-center justify-center overflow-hidden" x-data="{ count: 0, name: 'TETRIS' }">
+
+  <div class="flex flex-col items-center gap-4">
+
+    <!-- Title -->
+    <h1 class="text-2xl text-neon-cyan text-glow font-retro tracking-wider" x-text="name">TETRIS</h1>
+
+    <!-- Test panels -->
+    <div class="flex gap-4">
+
+      <!-- Left panel -->
+      <div class="flex flex-col gap-3 w-32">
+        <div class="border border-neon-cyan/30 rounded-lg p-3 bg-retro-dark/80 box-glow">
+          <div class="text-neon-cyan text-[8px] font-retro mb-2 opacity-70">SCORE</div>
+          <div class="text-neon-green text-sm font-retro text-glow" x-text="count">0</div>
+        </div>
+
+        <button @click="count++"
+          class="font-retro text-[8px] text-neon-green text-glow px-4 py-2 border border-neon-green/50 rounded hover:bg-neon-green/10 transition-colors">
+          +1
+        </button>
+
+        <button @click="count = 0"
+          class="font-retro text-[8px] text-neon-red px-4 py-2 border border-neon-red/50 rounded hover:bg-neon-red/10 transition-colors">
+          RESET
+        </button>
+      </div>
+
+      <!-- Placeholder for game area -->
+      <div class="border-2 border-neon-cyan/40 rounded-lg bg-retro-dark flex items-center justify-center"
+           style="width: 240px; height: 480px;">
+        <div class="text-neon-cyan text-[8px] font-retro opacity-50 text-center leading-relaxed">
+          GAME AREA<br/>PLACEHOLDER
+        </div>
+      </div>
+
+      <!-- Right panel -->
+      <div class="flex flex-col gap-3 w-32">
+        <div class="border border-neon-cyan/30 rounded-lg p-3 bg-retro-dark/80 box-glow">
+          <div class="text-neon-cyan text-[8px] font-retro mb-2 opacity-70">LEVEL</div>
+          <div class="text-neon-yellow text-sm font-retro text-glow">1</div>
+        </div>
+
+        <div class="border border-neon-pink/30 rounded-lg p-3 bg-retro-dark/80">
+          <div class="text-neon-pink text-[8px] font-retro mb-2 opacity-70">HIGH</div>
+          <div class="text-neon-pink text-sm font-retro">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-[6px] font-retro text-gray-600 mt-1">TAILWIND + ALPINE TEST</div>
+  </div>
+
+  <script type="module">
+    import "./main.css";
+    import Alpine from "alpinejs";
+    Alpine.start();
+  </script>
+</body>
+</html>

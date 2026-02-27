@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TETRIS - Classic Arcade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+</head>
+<body class="bg-retro-black h-screen flex items-center justify-center overflow-hidden" x-data="tetrisApp()">
+
+  <!-- Main Container -->
+  <div class="flex flex-col items-center gap-2">
+
+    <!-- Title -->
+    <h1 class="text-xl text-neon-cyan text-glow font-retro tracking-wider">TETRIS</h1>
+
+    <!-- Game Layout -->
+    <div class="flex gap-4 items-start">
+
+      <!-- Left Panel - Score & Level -->
+      <div class="flex flex-col gap-3 w-32">
+        <!-- Score -->
+        <div class="border border-neon-cyan/30 rounded-lg p-3 bg-retro-dark/80 box-glow">
+          <div class="text-neon-cyan text-[8px] font-retro mb-2 opacity-70">SCORE</div>
+          <div class="text-neon-green text-sm font-retro text-glow" x-text="score.toLocaleString()">0</div>
+        </div>
+
+        <!-- Level -->
+        <div class="border border-neon-cyan/30 rounded-lg p-3 bg-retro-dark/80 box-glow">
+          <div class="text-neon-cyan text-[8px] font-retro mb-2 opacity-70">LEVEL</div>
+          <div class="text-neon-yellow text-sm font-retro text-glow" x-text="level">1</div>
+        </div>
+
+        <!-- Lines -->
+        <div class="border border-neon-cyan/30 rounded-lg p-3 bg-retro-dark/80 box-glow">
+          <div class="text-neon-cyan text-[8px] font-retro mb-2 opacity-70">LINES</div>
+          <div class="text-neon-orange text-sm font-retro text-glow" x-text="lines">0</div>
+        </div>
+
+        <!-- High Score -->
+        <div class="border border-neon-pink/30 rounded-lg p-3 bg-retro-dark/80">
+          <div class="text-neon-pink text-[8px] font-retro mb-2 opacity-70">HIGH</div>
+          <div class="text-neon-pink text-sm font-retro" x-text="highScore.toLocaleString()">0</div>
+        </div>
+      </div>
+
+      <!-- Game Canvas Container -->
+      <div class="crt-effect scanlines border-2 border-neon-cyan/40 rounded-lg bg-retro-dark overflow-hidden" style="width: 240px; height: 480px;">
+        <div id="game-container" style="width: 240px; height: 480px;"></div>
+      </div>
+
+      <!-- Right Panel - Next Piece & Controls -->
+      <div class="flex flex-col gap-3 w-32">
+        <!-- Next Piece -->
+        <div class="border border-neon-cyan/30 rounded-lg p-3 bg-retro-dark/80 box-glow">
+          <div class="text-neon-cyan text-[8px] font-retro mb-2 opacity-70">NEXT</div>
+          <div id="next-piece-container" class="flex justify-center">
+            <canvas id="next-piece-canvas" width="80" height="80"></canvas>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="border border-neon-cyan/30 rounded-lg p-3 bg-retro-dark/80">
+          <div class="text-neon-cyan text-[8px] font-retro mb-3 opacity-70">CONTROLS</div>
+          <div class="flex flex-col gap-1.5 text-[6px] font-retro text-gray-400">
+            <div class="flex justify-between"><span>MOVE</span><span class="text-neon-cyan">&larr; &rarr;</span></div>
+            <div class="flex justify-between"><span>DOWN</span><span class="text-neon-cyan">&darr;</span></div>
+            <div class="flex justify-between"><span>DROP</span><span class="text-neon-cyan">SPACE</span></div>
+            <div class="flex justify-between"><span>ROTATE</span><span class="text-neon-cyan">&uarr; / Z</span></div>
+            <div class="flex justify-between"><span>PAUSE</span><span class="text-neon-cyan">P</span></div>
+          </div>
+        </div>
+
+        <!-- Sound Settings -->
+        <div class="border border-neon-cyan/30 rounded-lg p-3 bg-retro-dark/80">
+          <div class="text-neon-cyan text-[8px] font-retro mb-3 opacity-70">SOUND</div>
+          <div class="flex flex-col gap-2">
+            <button @click="toggleMusic()"
+              class="flex justify-between items-center font-retro text-[6px] px-2 py-1 rounded border transition-colors"
+              :class="musicOn ? 'text-neon-green border-neon-green/50' : 'text-gray-500 border-gray-600'">
+              <span>MUSIC</span>
+              <span x-text="musicOn ? 'ON' : 'OFF'"></span>
+            </button>
+            <button @click="toggleSfx()"
+              class="flex justify-between items-center font-retro text-[6px] px-2 py-1 rounded border transition-colors"
+              :class="sfxOn ? 'text-neon-green border-neon-green/50' : 'text-gray-500 border-gray-600'">
+              <span>SFX</span>
+              <span x-text="sfxOn ? 'ON' : 'OFF'"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Game State -->
+        <div class="text-center">
+          <template x-if="gameState === 'idle'">
+            <button @click="startGame()"
+              class="font-retro text-[8px] text-neon-green text-glow blink-slow px-4 py-2 border border-neon-green/50 rounded hover:bg-neon-green/10 transition-colors">
+              START
+            </button>
+          </template>
+          <template x-if="gameState === 'paused'">
+            <div class="font-retro text-[10px] text-neon-yellow text-glow blink-slow">PAUSED</div>
+          </template>
+          <template x-if="gameState === 'gameover'">
+            <div class="flex flex-col gap-2 items-center">
+              <div class="font-retro text-[10px] text-neon-red text-glow">GAME OVER</div>
+              <button @click="startGame()"
+                class="font-retro text-[7px] text-neon-green px-3 py-1.5 border border-neon-green/50 rounded hover:bg-neon-green/10 transition-colors">
+                RETRY
+              </button>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom credit -->
+    <div class="text-[6px] font-retro text-gray-600 mt-1">CLASSIC ARCADE EDITION</div>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>
