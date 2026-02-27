@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tetris — AI Planning Layer Demo</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+  <!-- Board -->
+  <div id="board-wrapper">
+    <canvas id="board"></canvas>
+  </div>
+
+  <!-- Side panel -->
+  <div id="panel">
+    <!-- Next piece preview -->
+    <div class="panel-box">
+      <h3>Next</h3>
+      <canvas id="preview"></canvas>
+    </div>
+
+    <!-- Score -->
+    <div class="panel-box">
+      <h3>Score</h3>
+      <div class="value" id="score">0</div>
+    </div>
+
+    <!-- Level -->
+    <div class="panel-box">
+      <h3>Level</h3>
+      <div class="value" id="level">1</div>
+    </div>
+
+    <!-- Lines -->
+    <div class="panel-box">
+      <h3>Lines</h3>
+      <div class="value" id="lines">0</div>
+    </div>
+
+    <!-- Controls hint -->
+    <div class="panel-box" id="controls">
+      <h3>Controls</h3>
+      <span>←/→</span> Move<br>
+      <span>↑ / X</span> Rotate<br>
+      <span>↓</span> Soft drop<br>
+      <span>Space</span> Hard drop<br>
+      <span>P / Esc</span> Pause<br>
+      <span>Enter</span> Start / restart
+    </div>
+  </div>
+
+  <script type="module">
+    import { createGame }     from './src/game.js';
+    import { createRenderer } from './src/renderer.js';
+    import { attachInput }    from './src/input.js';
+
+    const boardCanvas   = document.getElementById('board');
+    const previewCanvas = document.getElementById('preview');
+    const scoreEl       = document.getElementById('score');
+    const levelEl       = document.getElementById('level');
+    const linesEl       = document.getElementById('lines');
+
+    const renderer = createRenderer(boardCanvas, previewCanvas);
+
+    function onStateChange(state) {
+      renderer.render(state);
+      scoreEl.textContent = state.score;
+      levelEl.textContent = state.level;
+      linesEl.textContent = state.lines;
+    }
+
+    const game = createGame(onStateChange);
+
+    // Show idle screen immediately
+    onStateChange(game.getState());
+
+    // Wire up keyboard
+    attachInput({
+      start:  () => game.start(),
+      action: (act) => game.action(act),
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "rtx_ai_dev_game_tetris",
+  "version": "1.0.0",
+  "description": "Tetris game — AI planning layer demo",
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --testPathPattern=tests/"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-node": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {}
+  }
+}
