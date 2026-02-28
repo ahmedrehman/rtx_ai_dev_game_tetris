@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="0.8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="32" height="32" rx="4" fill="#0a0a0a"/>
+  <!-- T-tetromino (iconic Tetris shape) with neon glow -->
+  <g filter="url(#glow)">
+    <rect x="3" y="7" width="8" height="8" rx="1.5" fill="#00fff5"/>
+    <rect x="12" y="7" width="8" height="8" rx="1.5" fill="#39ff14"/>
+    <rect x="21" y="7" width="8" height="8" rx="1.5" fill="#ff00e4"/>
+    <rect x="12" y="16" width="8" height="8" rx="1.5" fill="#ffff00"/>
+  </g>
+  <!-- Highlight edges for 3D bevel look -->
+  <rect x="3" y="7" width="8" height="2" rx="0.5" fill="rgba(255,255,255,0.3)"/>
+  <rect x="12" y="7" width="8" height="2" rx="0.5" fill="rgba(255,255,255,0.3)"/>
+  <rect x="21" y="7" width="8" height="2" rx="0.5" fill="rgba(255,255,255,0.3)"/>
+  <rect x="12" y="16" width="8" height="2" rx="0.5" fill="rgba(255,255,255,0.3)"/>
+</svg>

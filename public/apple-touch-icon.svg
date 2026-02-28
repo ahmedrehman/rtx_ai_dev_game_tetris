@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="180" height="180" rx="28" fill="url(#bg)"/>
+  <!-- Grid lines (subtle) -->
+  <g opacity="0.1" stroke="#00fff5" stroke-width="0.5">
+    <line x1="15" y1="45" x2="165" y2="45"/>
+    <line x1="15" y1="90" x2="165" y2="90"/>
+    <line x1="15" y1="135" x2="165" y2="135"/>
+    <line x1="52" y1="15" x2="52" y2="165"/>
+    <line x1="90" y1="15" x2="90" y2="165"/>
+    <line x1="128" y1="15" x2="128" y2="165"/>
+  </g>
+  <!-- Tetris blocks arrangement -->
+  <g filter="url(#glow)">
+    <!-- T piece (top) -->
+    <rect x="18" y="22" width="42" height="42" rx="6" fill="#9b59b6"/>
+    <rect x="64" y="22" width="42" height="42" rx="6" fill="#9b59b6"/>
+    <rect x="110" y="22" width="42" height="42" rx="6" fill="#9b59b6"/>
+    <rect x="64" y="68" width="42" height="42" rx="6" fill="#9b59b6"/>
+    <!-- L piece (bottom-left) -->
+    <rect x="18" y="68" width="42" height="42" rx="6" fill="#ff6600"/>
+    <rect x="18" y="114" width="42" height="42" rx="6" fill="#ff6600"/>
+    <rect x="64" y="114" width="42" height="42" rx="6" fill="#ff6600"/>
+    <!-- I piece (right column) -->
+    <rect x="110" y="68" width="42" height="42" rx="6" fill="#00fff5"/>
+    <rect x="110" y="114" width="42" height="42" rx="6" fill="#00fff5"/>
+  </g>
+  <!-- 3D highlights -->
+  <g opacity="0.35" fill="white">
+    <rect x="18" y="22" width="42" height="6" rx="3"/>
+    <rect x="64" y="22" width="42" height="6" rx="3"/>
+    <rect x="110" y="22" width="42" height="6" rx="3"/>
+    <rect x="64" y="68" width="42" height="6" rx="3"/>
+    <rect x="18" y="68" width="42" height="6" rx="3"/>
+    <rect x="18" y="114" width="42" height="6" rx="3"/>
+    <rect x="64" y="114" width="42" height="6" rx="3"/>
+    <rect x="110" y="68" width="42" height="6" rx="3"/>
+    <rect x="110" y="114" width="42" height="6" rx="3"/>
+  </g>
+</svg>

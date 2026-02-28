@@ -166,6 +166,32 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  handleTouch(action: string): void {
+    switch (action) {
+      case "left":
+        if (this.gameState !== "playing") return;
+        if (this.movePiece(-1, 0)) audio.playMove();
+        break;
+      case "right":
+        if (this.gameState !== "playing") return;
+        if (this.movePiece(1, 0)) audio.playMove();
+        break;
+      case "down":
+        if (this.gameState !== "playing") return;
+        this.movePiece(0, 1);
+        break;
+      case "rotate":
+        this.tryRotate(1);
+        break;
+      case "drop":
+        this.hardDrop();
+        break;
+      case "pause":
+        this.togglePause();
+        break;
+    }
+  }
+
   startGame(): void {
     this.board.reset();
     this.score = 0;

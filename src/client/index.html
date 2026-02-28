@@ -2,57 +2,80 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <title>TETRIS - Classic Arcade</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0a0a0a" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    /* Hide Alpine components until initialized (prevents FOUC).
+       Uses opacity instead of display:none to preserve layout for Phaser canvas init. */
+    [x-cloak] { opacity: 0; }
+    /* Minimal loading state while JS loads */
+    body { background-color: #0a0a0a; }
+  </style>
 </head>
-<body class="bg-retro-black h-screen flex items-center justify-center overflow-hidden" x-data="tetrisApp()">
+<body class="bg-retro-black h-[100dvh] flex items-center justify-center overflow-hidden" x-data="tetrisApp()">
 
-  <!-- Main Container -->
-  <div class="flex flex-col items-center gap-2">
+  <!-- Main Container: full height flex column on mobile, auto-sized on desktop -->
+  <div class="flex flex-col items-center h-full w-full sm:h-auto sm:w-auto gap-1 sm:gap-2 p-1 sm:p-2 transition-opacity duration-200" x-cloak>
 
     <!-- Title -->
-    <h1 class="text-xl text-neon-cyan text-glow font-retro tracking-wider">TETRIS</h1>
+    <h1 class="text-[10px] sm:text-xl text-neon-cyan text-glow font-retro tracking-wider shrink-0">TETRIS</h1>
 
-    <!-- Game Layout -->
-    <div class="flex gap-4 items-start">
+    <!-- Desktop: side-by-side / Mobile: stacked column that fills available space -->
+    <div class="flex flex-col sm:flex-row gap-1 sm:gap-4 items-center sm:items-start flex-1 min-h-0 w-full sm:w-auto sm:flex-none">
 
-      <!-- Left Panel - Score & Level -->
-      <div class="flex flex-col gap-3 w-32">
+      <!-- Info Bar (horizontal on mobile, vertical panel on desktop) -->
+      <div class="flex sm:flex-col gap-1 sm:gap-3 sm:w-32 shrink-0 w-full max-w-[360px] sm:max-w-none">
         <!-- Score -->
-        <div class="border border-neon-cyan/30 rounded-lg p-3 bg-retro-dark/80 box-glow">
-          <div class="text-neon-cyan text-[8px] font-retro mb-2 opacity-70">SCORE</div>
-          <div class="text-neon-green text-sm font-retro text-glow" x-text="score.toLocaleString()">0</div>
+        <div class="border border-neon-cyan/30 rounded info-box sm:p-3 bg-retro-dark/80 box-glow flex-1 sm:flex-none">
+          <div class="text-neon-cyan info-box-label sm:text-[8px] font-retro opacity-70">SCORE</div>
+          <div class="text-neon-green info-box-value sm:text-sm font-retro text-glow" x-text="score.toLocaleString()">0</div>
         </div>
 
         <!-- Level -->
-        <div class="border border-neon-cyan/30 rounded-lg p-3 bg-retro-dark/80 box-glow">
-          <div class="text-neon-cyan text-[8px] font-retro mb-2 opacity-70">LEVEL</div>
-          <div class="text-neon-yellow text-sm font-retro text-glow" x-text="level">1</div>
+        <div class="border border-neon-cyan/30 rounded info-box sm:p-3 bg-retro-dark/80 box-glow flex-1 sm:flex-none">
+          <div class="text-neon-cyan info-box-label sm:text-[8px] font-retro opacity-70">LEVEL</div>
+          <div class="text-neon-yellow info-box-value sm:text-sm font-retro text-glow" x-text="level">1</div>
         </div>
 
         <!-- Lines -->
-        <div class="border border-neon-cyan/30 rounded-lg p-3 bg-retro-dark/80 box-glow">
-          <div class="text-neon-cyan text-[8px] font-retro mb-2 opacity-70">LINES</div>
-          <div class="text-neon-orange text-sm font-retro text-glow" x-text="lines">0</div>
+        <div class="border border-neon-cyan/30 rounded info-box sm:p-3 bg-retro-dark/80 box-glow flex-1 sm:flex-none">
+          <div class="text-neon-cyan info-box-label sm:text-[8px] font-retro opacity-70">LINES</div>
+          <div class="text-neon-orange info-box-value sm:text-sm font-retro text-glow" x-text="lines">0</div>
         </div>
 
         <!-- High Score -->
-        <div class="border border-neon-pink/30 rounded-lg p-3 bg-retro-dark/80">
-          <div class="text-neon-pink text-[8px] font-retro mb-2 opacity-70">HIGH</div>
-          <div class="text-neon-pink text-sm font-retro" x-text="highScore.toLocaleString()">0</div>
+        <div class="border border-neon-pink/30 rounded info-box sm:p-3 bg-retro-dark/80 flex-1 sm:flex-none">
+          <div class="text-neon-pink info-box-label sm:text-[8px] font-retro opacity-70">HIGH</div>
+          <div class="text-neon-pink info-box-value sm:text-sm font-retro" x-text="highScore.toLocaleString()">0</div>
+        </div>
+
+        <!-- Next piece (inline on mobile) -->
+        <div class="border border-neon-cyan/30 rounded info-box bg-retro-dark/80 box-glow sm:hidden flex-1">
+          <div class="text-neon-cyan info-box-label font-retro opacity-70">NEXT</div>
+          <div class="flex justify-center">
+            <canvas id="next-piece-canvas-mobile" width="40" height="40"></canvas>
+          </div>
         </div>
       </div>
 
-      <!-- Game Canvas Container -->
-      <div class="crt-effect scanlines border-2 border-neon-cyan/40 rounded-lg bg-retro-dark overflow-hidden" style="width: 240px; height: 480px;">
-        <div id="game-container" style="width: 240px; height: 480px;"></div>
+      <!-- Game Canvas Area (fills remaining vertical space on mobile) -->
+      <div class="flex-1 min-h-0 flex items-center justify-center w-full sm:w-auto sm:flex-none" id="game-area">
+        <div class="crt-effect scanlines border-2 border-neon-cyan/40 rounded-lg bg-retro-dark overflow-hidden" id="game-wrapper">
+          <div id="game-container"></div>
+        </div>
       </div>
 
-      <!-- Right Panel - Next Piece & Controls -->
-      <div class="flex flex-col gap-3 w-32">
+      <!-- Right Panel (desktop only) -->
+      <div class="hidden sm:flex flex-col gap-3 w-32">
         <!-- Next Piece -->
         <div class="border border-neon-cyan/30 rounded-lg p-3 bg-retro-dark/80 box-glow">
           <div class="text-neon-cyan text-[8px] font-retro mb-2 opacity-70">NEXT</div>
@@ -116,8 +139,62 @@
       </div>
     </div>
 
-    <!-- Bottom credit -->
-    <div class="text-[6px] font-retro text-gray-600 mt-1">CLASSIC ARCADE EDITION</div>
+    <!-- Mobile Touch Controls -->
+    <div class="flex sm:hidden gap-1 w-full max-w-[360px] shrink-0" id="touch-controls">
+      <!-- Left side: movement -->
+      <div class="flex gap-1 flex-1">
+        <button @pointerdown="touchAction('left')" class="touch-btn flex-1 text-neon-cyan border-neon-cyan/40">&larr;</button>
+        <button @pointerdown="touchAction('down')" class="touch-btn flex-1 text-neon-orange border-neon-orange/40">&darr;</button>
+        <button @pointerdown="touchAction('right')" class="touch-btn flex-1 text-neon-cyan border-neon-cyan/40">&rarr;</button>
+      </div>
+      <!-- Right side: actions -->
+      <div class="flex gap-1">
+        <button @pointerdown="touchAction('rotate')" class="touch-btn px-3 text-neon-green border-neon-green/40">&#8635;</button>
+        <button @pointerdown="touchAction('drop')" class="touch-btn px-3 text-neon-yellow border-neon-yellow/40">&#9660;</button>
+      </div>
+    </div>
+
+    <!-- Mobile bottom bar: start/pause + sound -->
+    <div class="flex sm:hidden gap-2 items-center shrink-0">
+      <template x-if="gameState === 'idle'">
+        <button @click="startGame()"
+          class="font-retro text-[7px] text-neon-green text-glow blink-slow px-3 py-1 border border-neon-green/50 rounded">
+          START
+        </button>
+      </template>
+      <template x-if="gameState === 'playing'">
+        <button @click="touchAction('pause')"
+          class="font-retro text-[7px] text-neon-yellow px-3 py-1 border border-neon-yellow/50 rounded">
+          PAUSE
+        </button>
+      </template>
+      <template x-if="gameState === 'paused'">
+        <button @click="touchAction('pause')"
+          class="font-retro text-[7px] text-neon-yellow text-glow blink-slow px-3 py-1 border border-neon-yellow/50 rounded">
+          RESUME
+        </button>
+      </template>
+      <template x-if="gameState === 'gameover'">
+        <button @click="startGame()"
+          class="font-retro text-[7px] text-neon-green px-3 py-1 border border-neon-green/50 rounded">
+          RETRY
+        </button>
+      </template>
+
+      <button @click="toggleMusic()"
+        class="font-retro text-[6px] px-2 py-1 rounded border transition-colors"
+        :class="musicOn ? 'text-neon-green border-neon-green/50' : 'text-gray-500 border-gray-600'">
+        &#9835;<span x-text="musicOn ? '' : 'X'"></span>
+      </button>
+      <button @click="toggleSfx()"
+        class="font-retro text-[6px] px-2 py-1 rounded border transition-colors"
+        :class="sfxOn ? 'text-neon-green border-neon-green/50' : 'text-gray-500 border-gray-600'">
+        &#9834;<span x-text="sfxOn ? '' : 'X'"></span>
+      </button>
+    </div>
+
+    <!-- Bottom credit (desktop only) -->
+    <div class="hidden sm:block text-[6px] font-retro text-gray-600 shrink-0">CLASSIC ARCADE EDITION</div>
   </div>
 
   <script type="module" src="./main.ts"></script>

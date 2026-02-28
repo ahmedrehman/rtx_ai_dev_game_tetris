@@ -83,3 +83,48 @@ body {
 .blink-slow {
   animation: blink 2s ease-in-out infinite;
 }
+
+/* Touch control buttons — scale with viewport */
+.touch-btn {
+  font-family: var(--font-family-retro);
+  font-size: clamp(10px, 3.5vw, 16px);
+  padding: clamp(6px, 2.2vw, 12px) clamp(4px, 1.5vw, 8px);
+  border-radius: 8px;
+  border-width: 2px;
+  border-style: solid;
+  background-color: rgba(26, 26, 46, 0.8);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.touch-btn:active {
+  background-color: rgba(26, 26, 46, 1);
+  transform: scale(0.95);
+}
+
+/* Mobile info bar — viewport-responsive sizing */
+@media (max-width: 639px) {
+  .info-box {
+    padding: clamp(2px, 0.7vw, 6px);
+  }
+  .info-box-label {
+    font-size: clamp(3px, 1.2vw, 6px);
+  }
+  .info-box-value {
+    font-size: clamp(5px, 2vw, 10px);
+  }
+}
+
+/* Prevent pull-to-refresh and overscroll */
+html {
+  overscroll-behavior: none;
+}
+
+/* Safe area insets for notched phones */
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
