@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>V2 Design Preview — Tetris Royale</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #111;
+      color: #eee;
+      padding: 20px;
+    }
+    h1 { text-align: center; color: #FFD700; margin-bottom: 8px; font-size: 24px; }
+    .subtitle { text-align: center; color: #888; margin-bottom: 30px; font-size: 13px; }
+    h2 {
+      color: #00E5FF;
+      font-size: 16px;
+      margin: 30px 0 12px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #333;
+    }
+    h3 { color: #D4A017; font-size: 13px; margin: 20px 0 8px; }
+
+    /* Layout Previews */
+    .layouts { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
+
+    /* Mobile Preview */
+    .mobile-frame {
+      width: 360px;
+      height: 640px;
+      border: 2px solid #444;
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #0D1B2A;
+      position: relative;
+    }
+    .mobile-frame::before {
+      content: 'MOBILE (360x640)';
+      position: absolute;
+      top: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: #666;
+    }
+    .m-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: #1a1a2e;
+      border-bottom: 1px solid #333;
+    }
+    .m-titlebar img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #D4A017; }
+    .m-titlebar .logo { height: 24px; width: auto; border: none; border-radius: 0; }
+    .m-titlebar .spacer { flex: 1; }
+    .m-titlebar .icon { width: 20px; height: 20px; border: none; border-radius: 0; }
+    .m-infobar {
+      display: flex;
+      gap: 4px;
+      padding: 4px 8px;
+    }
+    .m-infobox {
+      flex: 1;
+      background: #5D4037;
+      border: 1px solid #D4A017;
+      border-radius: 4px;
+      padding: 3px 4px;
+      text-align: center;
+    }
+    .m-infobox .lbl { font-size: 6px; color: #D4A017; text-transform: uppercase; }
+    .m-infobox .val { font-size: 10px; font-weight: bold; color: #FFD700; }
+    .m-infobox.next { display: flex; align-items: center; justify-content: center; gap: 2px; }
+    .m-infobox.next img { width: 20px; height: 20px; }
+    .m-game-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 0;
+    }
+    .m-board-container { position: relative; }
+    .m-board-texture {
+      width: 180px;
+      height: 360px;
+      background: #37474F;
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(20, 1fr);
+      gap: 1px;
+      border: 3px solid #D4A017;
+      border-radius: 2px;
+    }
+    .m-board-texture .cell { background: #2d3a42; border-radius: 1px; }
+    .m-board-texture .cell.filled { border-radius: 2px; }
+    .m-controls {
+      display: flex;
+      gap: 4px;
+      padding: 6px 8px;
+    }
+    .m-controls .left-group { display: flex; gap: 4px; flex: 1; }
+    .m-controls .right-group { display: flex; gap: 4px; }
+    .m-controls img { width: 40px; height: 40px; }
+    .m-bottombar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px 6px;
+      background: #1a1a2e;
+      border-top: 1px solid #333;
+    }
+    .m-xp { flex: 1; position: relative; height: 16px; }
+    .m-xp .frame { width: 100%; height: 100%; border: 2px solid #D4A017; border-radius: 8px; background: #37474F; }
+    .m-xp .fill {
+      position: absolute; top: 3px; left: 3px;
+      width: 60%; height: calc(100% - 6px);
+      background: linear-gradient(90deg, #00E5FF, #40C4FF);
+      border-radius: 6px;
+    }
+    .m-bottombar .icon { width: 16px; height: 16px; }
+
+    /* Character popup overlay on mobile */
+    .m-char-popup {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 80px;
+      height: 80px;
+      opacity: 0.9;
+    }
+    .m-char-popup img { width: 100%; height: 100%; }
+
+    /* Desktop Preview */
+    .desktop-frame {
+      width: 700px;
+      height: 520px;
+      border: 2px solid #444;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #0D1B2A;
+      position: relative;
+    }
+    .desktop-frame::before {
+      content: 'DESKTOP (700x520)';
+      position: absolute;
+      top: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: #666;
+    }
+    .d-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      background: #1a1a2e;
+      border-bottom: 1px solid #333;
+    }
+    .d-header img { height: 36px; width: auto; }
+    .d-body {
+      flex: 1;
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      min-height: 0;
+    }
+    .d-char {
+      width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .d-char img { width: 110px; height: 110px; }
+    .d-char .name { font-size: 10px; color: #D4A017; }
+    .d-board-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .d-board-container { position: relative; }
+    .d-board-texture {
+      width: 200px;
+      height: 400px;
+      background: #37474F;
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(20, 1fr);
+      gap: 1px;
+      border: 3px solid #D4A017;
+      border-radius: 2px;
+    }
+    .d-board-texture .cell { background: #2d3a42; border-radius: 1px; }
+    .d-board-texture .cell.filled { border-radius: 2px; }
+    .d-right-panel {
+      width: 140px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .d-panel-box {
+      background: #5D4037;
+      border: 2px solid #D4A017;
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+    }
+    .d-panel-box .lbl { font-size: 8px; color: #D4A017; margin-bottom: 4px; }
+    .d-panel-box .val { font-size: 14px; font-weight: bold; color: #FFD700; }
+    .d-panel-box .next-img { width: 60px; height: 60px; margin: 4px auto; display: block; }
+    .d-icons { display: flex; gap: 6px; justify-content: center; margin-top: auto; }
+    .d-icons img { width: 24px; height: 24px; }
+    .d-footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: #1a1a2e;
+      border-top: 1px solid #333;
+    }
+    .d-xp { flex: 1; position: relative; height: 20px; }
+    .d-xp .frame { width: 100%; height: 100%; border: 2px solid #D4A017; border-radius: 10px; background: #37474F; }
+    .d-xp .fill {
+      position: absolute; top: 3px; left: 3px;
+      width: 45%; height: calc(100% - 6px);
+      background: linear-gradient(90deg, #00E5FF, #40C4FF);
+      border-radius: 8px;
+    }
+
+    /* Asset Catalog */
+    .catalog { max-width: 1100px; margin: 40px auto; }
+    .asset-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .asset-card {
+      background: #1a1a2e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .asset-card img {
+      max-width: 120px;
+      max-height: 120px;
+      object-fit: contain;
+      image-rendering: auto;
+    }
+    .asset-card img.large { max-width: 200px; max-height: 200px; }
+    .asset-card img.wide { max-width: 250px; max-height: 60px; }
+    .asset-card img.tall { max-width: 80px; max-height: 160px; }
+    .asset-card .fname { font-size: 10px; color: #888; font-family: monospace; }
+    .asset-card .dims { font-size: 9px; color: #555; }
+
+    /* Tetris pieces on board */
+    .piece-colors {
+      --cyan: #00E5FF; --yellow: #FFD600; --purple: #9C27B0;
+      --green: #4CAF50; --red: #F44336; --blue: #1565C0;
+      --orange: #FF9800; --ghost: #78909C;
+    }
+  </style>
+</head>
+<body>
+  <h1>TETRIS ROYALE — V2 Design Preview</h1>
+  <p class="subtitle">Placeholder assets at correct sizes and colors. Replace with Ludo AI generated art.</p>
+
+  <!-- ===== LAYOUT PREVIEWS ===== -->
+  <div class="layouts">
+
+    <!-- MOBILE LAYOUT -->
+    <div style="position:relative; margin-top:24px;">
+      <div class="mobile-frame">
+        <!-- Title Bar -->
+        <div class="m-titlebar">
+          <img src="assets/v2/avatar_idle.png" alt="avatar"/>
+          <img src="assets/v2/logo_compact.png" alt="logo" class="logo"/>
+          <span class="spacer"></span>
+          <img src="assets/v2/icon_settings.png" alt="settings" class="icon"/>
+        </div>
+
+        <!-- Info Bar -->
+        <div class="m-infobar">
+          <div class="m-infobox"><div class="lbl">Score</div><div class="val">12400</div></div>
+          <div class="m-infobox"><div class="lbl">Level</div><div class="val">3</div></div>
+          <div class="m-infobox"><div class="lbl">Lines</div><div class="val">24</div></div>
+          <div class="m-infobox next">
+            <div class="lbl">Next</div>
+            <img src="assets/v2/block_t.png" alt="next"/>
+          </div>
+        </div>
+
+        <!-- Game Board Area -->
+        <div class="m-game-area">
+          <div class="m-board-container">
+            <div class="m-board-texture" id="m-board"></div>
+            <!-- Character popup -->
+            <div class="m-char-popup">
+              <img src="assets/v2/char_happy.png" alt="character"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Touch Controls -->
+        <div class="m-controls">
+          <div class="left-group">
+            <img src="assets/v2/btn_left.png" alt="left"/>
+            <img src="assets/v2/btn_down.png" alt="down"/>
+            <img src="assets/v2/btn_right.png" alt="right"/>
+          </div>
+          <div class="right-group">
+            <img src="assets/v2/btn_rotate.png" alt="rotate"/>
+            <img src="assets/v2/btn_drop.png" alt="drop"/>
+            <img src="assets/v2/btn_pause.png" alt="pause"/>
+          </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="m-bottombar">
+          <div class="m-xp">
+            <div class="frame"></div>
+            <div class="fill"></div>
+          </div>
+          <img src="assets/v2/icon_music_on.png" alt="music" class="icon"/>
+          <img src="assets/v2/icon_sfx_on.png" alt="sfx" class="icon"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESKTOP LAYOUT -->
+    <div style="position:relative; margin-top:24px;">
+      <div class="desktop-frame">
+        <!-- Header -->
+        <div class="d-header">
+          <img src="assets/v2/logo_full.png" alt="logo"/>
+        </div>
+
+        <!-- Body: Character | Board | Right Panel -->
+        <div class="d-body">
+          <!-- Left: Character -->
+          <div class="d-char">
+            <img src="assets/v2/char_idle.png" alt="character"/>
+            <span class="name">Tetris Knight</span>
+          </div>
+
+          <!-- Center: Board -->
+          <div class="d-board-area">
+            <div class="d-board-container">
+              <div class="d-board-texture" id="d-board"></div>
+            </div>
+          </div>
+
+          <!-- Right: Panels -->
+          <div class="d-right-panel">
+            <div class="d-panel-box">
+              <div class="lbl">NEXT</div>
+              <img src="assets/v2/frame_next.png" alt="next" class="next-img"/>
+            </div>
+            <div class="d-panel-box">
+              <div class="lbl">SCORE</div>
+              <div class="val">12,400</div>
+            </div>
+            <div class="d-panel-box">
+              <div class="lbl">LEVEL</div>
+              <div class="val">3</div>
+            </div>
+            <div class="d-panel-box">
+              <div class="lbl">LINES</div>
+              <div class="val">24</div>
+            </div>
+            <div class="d-icons">
+              <img src="assets/v2/icon_settings.png" alt="settings"/>
+              <img src="assets/v2/icon_music_on.png" alt="music"/>
+              <img src="assets/v2/icon_sfx_on.png" alt="sfx"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer: XP Bar -->
+        <div class="d-footer">
+          <div class="d-xp">
+            <div class="frame"></div>
+            <div class="fill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ASSET CATALOG ===== -->
+  <div class="catalog">
+    <h2>All Assets (49 images)</h2>
+
+    <h3>1. Character — Full Body (512x512)</h3>
+    <div class="asset-group">
+      <div class="asset-card"><img src="assets/v2/char_idle.png" class="large"/><div class="fname">char_idle.png</div></div>
+      <div class="asset-card"><img src="assets/v2/char_happy.png" class="large"/><div class="fname">char_happy.png</div></div>
+      <div class="asset-card"><img src="assets/v2/char_excited.png" class="large"/><div class="fname">char_excited.png</div></div>
+      <div class="asset-card"><img src="assets/v2/char_worried.png" class="large"/><div class="fname">char_worried.png</div></div>
+      <div class="asset-card"><img src="assets/v2/char_defeated.png" class="large"/><div class="fname">char_defeated.png</div></div>
+    </div>
+
+    <h3>2. Character — Avatar (128x128)</h3>
+    <div class="asset-group">
+      <div class="asset-card"><img src="assets/v2/avatar_idle.png"/><div class="fname">avatar_idle.png</div></div>
+      <div class="asset-card"><img src="assets/v2/avatar_happy.png"/><div class="fname">avatar_happy.png</div></div>
+      <div class="asset-card"><img src="assets/v2/avatar_excited.png"/><div class="fname">avatar_excited.png</div></div>
+      <div class="asset-card"><img src="assets/v2/avatar_worried.png"/><div class="fname">avatar_worried.png</div></div>
+      <div class="asset-card"><img src="assets/v2/avatar_defeated.png"/><div class="fname">avatar_defeated.png</div></div>
+    </div>
+
+    <h3>3. Block Textures (128x128)</h3>
+    <div class="asset-group">
+      <div class="asset-card"><img src="assets/v2/block_i.png"/><div class="fname">block_i.png</div><div class="dims">Cyan</div></div>
+      <div class="asset-card"><img src="assets/v2/block_o.png"/><div class="fname">block_o.png</div><div class="dims">Yellow</div></div>
+      <div class="asset-card"><img src="assets/v2/block_t.png"/><div class="fname">block_t.png</div><div class="dims">Purple</div></div>
+      <div class="asset-card"><img src="assets/v2/block_s.png"/><div class="fname">block_s.png</div><div class="dims">Green</div></div>
+      <div class="asset-card"><img src="assets/v2/block_z.png"/><div class="fname">block_z.png</div><div class="dims">Red</div></div>
+      <div class="asset-card"><img src="assets/v2/block_j.png"/><div class="fname">block_j.png</div><div class="dims">Blue</div></div>
+      <div class="asset-card"><img src="assets/v2/block_l.png"/><div class="fname">block_l.png</div><div class="dims">Orange</div></div>
+      <div class="asset-card"><img src="assets/v2/block_ghost.png"/><div class="fname">block_ghost.png</div><div class="dims">Ghost</div></div>
+    </div>
+
+    <h3>4. Game Board</h3>
+    <div class="asset-group">
+      <div class="asset-card"><img src="assets/v2/board_texture.png" class="large"/><div class="fname">board_texture.png</div><div class="dims">256x256</div></div>
+      <div class="asset-card"><img src="assets/v2/board_frame.png" class="tall"/><div class="fname">board_frame.png</div><div class="dims">512x1024</div></div>
+    </div>
+
+    <h3>5. UI Panels (9-slice)</h3>
+    <div class="asset-group">
+      <div class="asset-card"><img src="assets/v2/panel_h.png" class="wide"/><div class="fname">panel_h.png</div><div class="dims">512x128</div></div>
+      <div class="asset-card"><img src="assets/v2/panel_sq.png"/><div class="fname">panel_sq.png</div><div class="dims">256x256</div></div>
+    </div>
+
+    <h3>6. Logo</h3>
+    <div class="asset-group">
+      <div class="asset-card"><img src="assets/v2/logo_full.png" class="wide"/><div class="fname">logo_full.png</div><div class="dims">800x200</div></div>
+      <div class="asset-card"><img src="assets/v2/logo_compact.png" class="wide"/><div class="fname">logo_compact.png</div><div class="dims">400x100</div></div>
+    </div>
+
+    <h3>7. Touch Control Buttons (128x128)</h3>
+    <div class="asset-group">
+      <div class="asset-card"><img src="assets/v2/btn_left.png"/><div class="fname">btn_left.png</div></div>
+      <div class="asset-card"><img src="assets/v2/btn_right.png"/><div class="fname">btn_right.png</div></div>
+      <div class="asset-card"><img src="assets/v2/btn_down.png"/><div class="fname">btn_down.png</div></div>
+      <div class="asset-card"><img src="assets/v2/btn_rotate.png"/><div class="fname">btn_rotate.png</div></div>
+      <div class="asset-card"><img src="assets/v2/btn_drop.png"/><div class="fname">btn_drop.png</div></div>
+      <div class="asset-card"><img src="assets/v2/btn_pause.png"/><div class="fname">btn_pause.png</div></div>
+    </div>
+
+    <h3>8. Effect Sprites</h3>
+    <div class="asset-group">
+      <div class="asset-card"><img src="assets/v2/fx_lineclear.png" class="wide"/><div class="fname">fx_lineclear.png</div><div class="dims">512x64</div></div>
+      <div class="asset-card"><img src="assets/v2/fx_tetris.png" class="large"/><div class="fname">fx_tetris.png</div><div class="dims">512x512</div></div>
+      <div class="asset-card"><img src="assets/v2/fx_levelup.png" class="large"/><div class="fname">fx_levelup.png</div><div class="dims">512x256</div></div>
+      <div class="asset-card"><img src="assets/v2/fx_combo_bg.png"/><div class="fname">fx_combo_bg.png</div><div class="dims">256x256</div></div>
+    </div>
+
+    <h3>9. Particles (64x64)</h3>
+    <div class="asset-group">
+      <div class="asset-card"><img src="assets/v2/particle_sparkle.png"/><div class="fname">particle_sparkle.png</div></div>
+      <div class="asset-card"><img src="assets/v2/particle_star.png"/><div class="fname">particle_star.png</div></div>
+      <div class="asset-card"><img src="assets/v2/particle_shard.png"/><div class="fname">particle_shard.png</div></div>
+      <div class="asset-card"><img src="assets/v2/particle_coin.png"/><div class="fname">particle_coin.png</div></div>
+    </div>
+
+    <h3>10. XP / Progress Bar</h3>
+    <div class="asset-group">
+      <div class="asset-card"><img src="assets/v2/xp_frame.png" class="wide"/><div class="fname">xp_frame.png</div><div class="dims">512x64</div></div>
+      <div class="asset-card"><img src="assets/v2/xp_fill.png" class="wide"/><div class="fname">xp_fill.png</div><div class="dims">512x48</div></div>
+    </div>
+
+    <h3>11. Next Piece Frame (256x256)</h3>
+    <div class="asset-group">
+      <div class="asset-card"><img src="assets/v2/frame_next.png"/><div class="fname">frame_next.png</div></div>
+    </div>
+
+    <h3>12. Icons (128x128)</h3>
+    <div class="asset-group">
+      <div class="asset-card"><img src="assets/v2/icon_settings.png"/><div class="fname">icon_settings.png</div></div>
+      <div class="asset-card"><img src="assets/v2/icon_music_on.png"/><div class="fname">icon_music_on.png</div></div>
+      <div class="asset-card"><img src="assets/v2/icon_music_off.png"/><div class="fname">icon_music_off.png</div></div>
+      <div class="asset-card"><img src="assets/v2/icon_sfx_on.png"/><div class="fname">icon_sfx_on.png</div></div>
+      <div class="asset-card"><img src="assets/v2/icon_sfx_off.png"/><div class="fname">icon_sfx_off.png</div></div>
+    </div>
+
+    <h3>13. App Icon / Favicon</h3>
+    <div class="asset-group">
+      <div class="asset-card"><img src="assets/v2/icon_v2_512.png" class="large"/><div class="fname">icon_v2_512.png</div><div class="dims">512x512</div></div>
+      <div class="asset-card"><img src="assets/v2/icon_v2_64.png"/><div class="fname">icon_v2_64.png</div><div class="dims">64x64</div></div>
+    </div>
+
+    <h3>14. Background Pattern (256x256, tileable)</h3>
+    <div class="asset-group">
+      <div class="asset-card"><img src="assets/v2/bg_pattern.png" class="large"/><div class="fname">bg_pattern.png</div></div>
+    </div>
+  </div>
+
+  <script>
+    // Fill boards with colored tetris pieces
+    function fillBoard(boardId) {
+      const board = document.getElementById(boardId);
+      const colors = ['#00E5FF','#FFD600','#9C27B0','#4CAF50','#F44336','#1565C0','#FF9800'];
+      // Create 200 cells (10x20)
+      for (let i = 0; i < 200; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        // Fill bottom rows with some blocks to simulate a game in progress
+        const row = Math.floor(i / 10);
+        const col = i % 10;
+        if (row >= 14) {
+          // Random fill for bottom rows with some gaps
+          if (Math.random() > 0.25 || row >= 18) {
+            if (!(row === 14 && col > 6) && !(row === 15 && col > 7)) {
+              cell.classList.add('filled');
+              cell.style.background = colors[Math.floor(Math.random() * colors.length)];
+              cell.style.border = '1px solid rgba(0,0,0,0.3)';
+              cell.style.borderRadius = '2px';
+            }
+          }
+        }
+        // Active T-piece near top
+        if ((row === 8 && col >= 4 && col <= 6) || (row === 7 && col === 5)) {
+          cell.classList.add('filled');
+          cell.style.background = '#9C27B0';
+          cell.style.border = '1px solid rgba(0,0,0,0.3)';
+          cell.style.borderRadius = '2px';
+        }
+        // Ghost piece
+        if ((row === 13 && col >= 4 && col <= 6) || (row === 12 && col === 5)) {
+          if (!cell.classList.contains('filled')) {
+            cell.style.background = 'rgba(120,144,156,0.3)';
+            cell.style.border = '1px dashed rgba(120,144,156,0.5)';
+            cell.style.borderRadius = '2px';
+          }
+        }
+        board.appendChild(cell);
+      }
+    }
+    fillBoard('m-board');
+    fillBoard('d-board');
+  </script>
+</body>
+</html>

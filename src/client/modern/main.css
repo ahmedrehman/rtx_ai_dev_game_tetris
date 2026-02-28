@@ -1,0 +1,213 @@
+@import "tailwindcss";
+
+@theme {
+  --color-v2-navy: #0D1B2A;
+  --color-v2-navy-dark: #070D15;
+  --color-v2-royal: #1E3A8A;
+  --color-v2-gold: #D4A017;
+  --color-v2-gold-bright: #FFD700;
+  --color-v2-wood: #5D4037;
+  --color-v2-stone: #37474F;
+  --color-v2-cyan: #00E5FF;
+  --color-v2-red: #E53935;
+  --color-v2-green: #43A047;
+  --color-v2-cream: #FFF8E1;
+  --font-family-v2: "Bungee", "Impact", sans-serif;
+}
+
+body {
+  background-color: var(--color-v2-navy-dark);
+  background-image: url("/assets/v2/bg_pattern.png");
+  background-repeat: repeat;
+  background-size: 64px 64px;
+  font-family: var(--font-family-v2);
+  overflow: hidden;
+}
+
+/* FOUC prevention */
+[x-cloak] { opacity: 0; }
+
+/* 9-slice panel using border-image */
+.v2-panel {
+  border: 12px solid transparent;
+  border-image: url("/assets/v2/panel_h.png") 24 fill stretch;
+  padding: 4px 8px;
+}
+
+.v2-panel-sq {
+  border: 12px solid transparent;
+  border-image: url("/assets/v2/panel_sq.png") 24 fill stretch;
+  padding: 4px;
+}
+
+/* Touch control buttons */
+.v2-touch-btn {
+  width: clamp(36px, 10vw, 48px);
+  height: clamp(36px, 10vw, 48px);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.v2-touch-btn:active {
+  transform: scale(0.9);
+}
+
+.v2-touch-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* XP bar */
+.xp-bar {
+  position: relative;
+  height: 20px;
+  width: 100%;
+}
+
+.xp-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  z-index: 2;
+}
+
+.xp-fill-container {
+  position: absolute;
+  inset: 2px 4px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.xp-fill {
+  height: 100%;
+  object-fit: cover;
+  object-position: left;
+}
+
+/* Info panel text */
+.v2-label {
+  font-size: clamp(6px, 1.5vw, 10px);
+  text-transform: uppercase;
+  color: var(--color-v2-gold);
+  letter-spacing: 0.05em;
+}
+
+.v2-value {
+  font-size: clamp(10px, 3vw, 18px);
+  color: var(--color-v2-cream);
+  font-weight: bold;
+}
+
+/* Game board wrapper */
+.v2-board-wrapper {
+  position: relative;
+  box-sizing: content-box;
+  border: 3px solid var(--color-v2-gold);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(212, 160, 23, 0.3), inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Gold text glow */
+.v2-text-glow {
+  text-shadow: 0 0 8px var(--color-v2-gold), 0 0 16px rgba(212, 160, 23, 0.5);
+}
+
+/* Sound toggle buttons */
+.v2-sound-btn {
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.v2-sound-btn:hover {
+  opacity: 1;
+}
+
+.v2-sound-btn.off {
+  opacity: 0.4;
+}
+
+/* Mobile info bar — viewport-responsive sizing */
+@media (max-width: 639px) {
+  .v2-info-mobile .v2-label {
+    font-size: clamp(4px, 1.2vw, 7px);
+  }
+  .v2-info-mobile .v2-value {
+    font-size: clamp(7px, 2.2vw, 12px);
+  }
+}
+
+/* Prevent pull-to-refresh and overscroll */
+html {
+  overscroll-behavior: none;
+}
+
+/* Safe area insets for notched phones */
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Overlay styling */
+.v2-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(13, 27, 42, 0.85);
+  z-index: 20;
+}
+
+.v2-overlay-btn {
+  font-family: var(--font-family-v2);
+  font-size: clamp(12px, 3vw, 20px);
+  color: var(--color-v2-navy);
+  background: linear-gradient(180deg, var(--color-v2-gold-bright) 0%, var(--color-v2-gold) 100%);
+  border: 2px solid var(--color-v2-wood);
+  border-radius: 8px;
+  padding: 8px 24px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: transform 0.1s;
+}
+
+.v2-overlay-btn:hover {
+  transform: scale(1.05);
+}
+
+.v2-overlay-btn:active {
+  transform: scale(0.95);
+}
+
+/* Blink animation for START */
+@keyframes v2-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.v2-pulse {
+  animation: v2-pulse 2s ease-in-out infinite;
+}
+
+/* Character pop-up animation */
+.v2-char-popup {
+  transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+}
+
+.v2-char-popup[hidden] {
+  transform: scale(0);
+  opacity: 0;
+}

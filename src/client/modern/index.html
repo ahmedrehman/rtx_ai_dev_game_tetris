@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>TETRIS ROYALE</title>
+  <link rel="icon" href="/assets/v2/icon_v2_64.png" />
+  <link rel="apple-touch-icon" href="/assets/v2/icon_v2_512.png" />
+  <meta name="theme-color" content="#0D1B2A" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet" />
+  <style>
+    [x-cloak] { opacity: 0; }
+    body { background-color: #0D1B2A; }
+  </style>
+</head>
+<body class="bg-v2-navy-dark h-[100dvh] flex items-center justify-center overflow-hidden" x-data="tetrisRoyaleApp()">
+
+  <!-- Main Container -->
+  <div class="flex flex-col items-center h-full w-full sm:h-auto sm:w-auto gap-1 sm:gap-2 p-1 sm:p-2 transition-opacity duration-200" x-cloak>
+
+    <!-- === MOBILE TITLE BAR === -->
+    <div class="flex sm:hidden items-center justify-between w-full max-w-[360px] shrink-0 px-1">
+      <!-- Avatar -->
+      <img :src="'/assets/v2/avatar_' + charState + '.png'" class="w-8 h-8 rounded-full border-2 border-v2-gold" />
+      <!-- Logo -->
+      <img src="/assets/v2/logo_compact.png" class="h-6" />
+      <!-- Settings -->
+      <img src="/assets/v2/icon_settings.png" class="w-6 h-6 cursor-pointer opacity-80 hover:opacity-100" />
+    </div>
+
+    <!-- === DESKTOP HEADER === -->
+    <div class="hidden sm:flex items-center justify-center shrink-0">
+      <img src="/assets/v2/logo_full.png" class="h-12" />
+    </div>
+
+    <!-- === MOBILE INFO BAR === -->
+    <div class="flex sm:hidden gap-1 w-full max-w-[360px] shrink-0 v2-info-mobile">
+      <div class="v2-panel flex-1 text-center">
+        <div class="v2-label">Score</div>
+        <div class="v2-value" x-text="score.toLocaleString()">0</div>
+      </div>
+      <div class="v2-panel flex-1 text-center">
+        <div class="v2-label">Level</div>
+        <div class="v2-value" x-text="level">1</div>
+      </div>
+      <div class="v2-panel flex-1 text-center">
+        <div class="v2-label">Lines</div>
+        <div class="v2-value" x-text="lines">0</div>
+      </div>
+      <div class="v2-panel flex-1 text-center">
+        <div class="v2-label">Next</div>
+        <div class="flex justify-center mt-0.5">
+          <canvas id="next-piece-canvas-mobile" width="40" height="40"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- === MAIN CONTENT: Desktop 3-column / Mobile stacked === -->
+    <div class="flex flex-col sm:flex-row gap-1 sm:gap-4 items-center sm:items-start flex-1 min-h-0 w-full sm:w-auto sm:flex-none">
+
+      <!-- Desktop Left Column: Character -->
+      <div class="hidden sm:flex flex-col items-center gap-2 w-[140px]">
+        <img :src="'/assets/v2/char_' + charState + '.png'" class="w-[110px] h-[110px] object-contain" />
+        <div class="text-v2-gold text-sm font-[Bungee] v2-text-glow">Knight</div>
+      </div>
+
+      <!-- Game Canvas Area -->
+      <div class="flex-1 min-h-0 flex items-center justify-center w-full sm:w-auto sm:flex-none relative" id="game-area">
+        <div class="v2-board-wrapper" id="game-wrapper">
+          <div id="game-container"></div>
+        </div>
+
+        <!-- Game State Overlays -->
+        <template x-if="gameState === 'idle'">
+          <div class="v2-overlay" style="position:absolute;inset:0;z-index:20;">
+            <div class="text-center">
+              <div class="text-v2-gold-bright text-lg font-[Bungee] v2-text-glow mb-4">TETRIS ROYALE</div>
+              <button @click="startGame()" class="v2-overlay-btn v2-pulse">START</button>
+            </div>
+          </div>
+        </template>
+        <template x-if="gameState === 'paused'">
+          <div class="v2-overlay" style="position:absolute;inset:0;z-index:20;">
+            <div class="text-v2-gold-bright text-lg font-[Bungee] v2-text-glow v2-pulse">PAUSED</div>
+          </div>
+        </template>
+        <template x-if="gameState === 'gameover'">
+          <div class="v2-overlay" style="position:absolute;inset:0;z-index:20;">
+            <div class="text-center">
+              <div class="text-v2-red text-lg font-[Bungee] mb-2">GAME OVER</div>
+              <div class="text-v2-cream text-sm mb-4">Score: <span x-text="score.toLocaleString()"></span></div>
+              <button @click="startGame()" class="v2-overlay-btn">RETRY</button>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- Desktop Right Column: Info Panels -->
+      <div class="hidden sm:flex flex-col gap-3 w-[160px]">
+        <!-- Next Piece -->
+        <div class="v2-panel-sq text-center">
+          <div class="v2-label mb-1">Next</div>
+          <div class="flex justify-center">
+            <canvas id="next-piece-canvas" width="80" height="80"></canvas>
+          </div>
+        </div>
+
+        <!-- Score -->
+        <div class="v2-panel text-center">
+          <div class="v2-label">Score</div>
+          <div class="v2-value" x-text="score.toLocaleString()">0</div>
+        </div>
+
+        <!-- Level -->
+        <div class="v2-panel text-center">
+          <div class="v2-label">Level</div>
+          <div class="v2-value" x-text="level">1</div>
+        </div>
+
+        <!-- Lines -->
+        <div class="v2-panel text-center">
+          <div class="v2-label">Lines</div>
+          <div class="v2-value" x-text="lines">0</div>
+        </div>
+
+        <!-- High Score -->
+        <div class="v2-panel text-center">
+          <div class="v2-label">High Score</div>
+          <div class="v2-value text-v2-gold-bright" x-text="highScore.toLocaleString()">0</div>
+        </div>
+
+        <!-- Sound Controls -->
+        <div class="flex justify-center gap-3">
+          <img :src="musicOn ? '/assets/v2/icon_music_on.png' : '/assets/v2/icon_music_off.png'"
+               @click="toggleMusic()" class="v2-sound-btn" :class="{ 'off': !musicOn }" />
+          <img :src="sfxOn ? '/assets/v2/icon_sfx_on.png' : '/assets/v2/icon_sfx_off.png'"
+               @click="toggleSfx()" class="v2-sound-btn" :class="{ 'off': !sfxOn }" />
+        </div>
+      </div>
+    </div>
+
+    <!-- === MOBILE TOUCH CONTROLS === -->
+    <div class="flex sm:hidden gap-2 w-full max-w-[360px] shrink-0 justify-between px-1" id="touch-controls">
+      <!-- Left group: movement -->
+      <div class="flex gap-1 flex-1">
+        <button @pointerdown="touchAction('left')" class="v2-touch-btn flex-1">
+          <img src="/assets/v2/btn_left.png" />
+        </button>
+        <button @pointerdown="touchAction('down')" class="v2-touch-btn flex-1">
+          <img src="/assets/v2/btn_down.png" />
+        </button>
+        <button @pointerdown="touchAction('right')" class="v2-touch-btn flex-1">
+          <img src="/assets/v2/btn_right.png" />
+        </button>
+      </div>
+      <!-- Right group: actions -->
+      <div class="flex gap-1">
+        <button @pointerdown="touchAction('rotate')" class="v2-touch-btn">
+          <img src="/assets/v2/btn_rotate.png" />
+        </button>
+        <button @pointerdown="touchAction('drop')" class="v2-touch-btn">
+          <img src="/assets/v2/btn_drop.png" />
+        </button>
+        <button @pointerdown="touchAction('pause')" class="v2-touch-btn">
+          <img src="/assets/v2/btn_pause.png" />
+        </button>
+      </div>
+    </div>
+
+    <!-- === MOBILE BOTTOM BAR: XP + Sound === -->
+    <div class="flex sm:hidden items-center gap-2 w-full max-w-[360px] shrink-0 px-1">
+      <!-- XP Bar -->
+      <div class="xp-bar flex-1">
+        <img src="/assets/v2/xp_frame.png" class="xp-frame" />
+        <div class="xp-fill-container">
+          <img src="/assets/v2/xp_fill.png" class="xp-fill" :style="{ width: xpPercent + '%' }" />
+        </div>
+      </div>
+      <!-- Sound toggles -->
+      <img :src="musicOn ? '/assets/v2/icon_music_on.png' : '/assets/v2/icon_music_off.png'"
+           @click="toggleMusic()" class="v2-sound-btn" :class="{ 'off': !musicOn }" />
+      <img :src="sfxOn ? '/assets/v2/icon_sfx_on.png' : '/assets/v2/icon_sfx_off.png'"
+           @click="toggleSfx()" class="v2-sound-btn" :class="{ 'off': !sfxOn }" />
+    </div>
+
+    <!-- === DESKTOP FOOTER: XP Bar === -->
+    <div class="hidden sm:flex items-center w-full max-w-[500px] shrink-0 px-4">
+      <div class="xp-bar flex-1">
+        <img src="/assets/v2/xp_frame.png" class="xp-frame" />
+        <div class="xp-fill-container">
+          <img src="/assets/v2/xp_fill.png" class="xp-fill" :style="{ width: xpPercent + '%' }" />
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>
